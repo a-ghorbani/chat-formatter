@@ -1,0 +1,15 @@
+
+/node_modules
+
+tmp
+*.log
+/errors
+
+/.vscode/**/*
+!/.vscode/extensions.json
+!/.vscode/settings.example.json
+
+.DS_Store
+.idea
+
+/dist*
