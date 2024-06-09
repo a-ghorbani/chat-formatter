@@ -1,9 +1,9 @@
-import { TemplateConfig } from "../types";
+import { TemplateConfig } from '../types';
 
 const danube2Template: TemplateConfig = {
-    bosToken: '<s>',
-    eosToken: '</s>',
-    chatTemplate: `
+  bosToken: '<s>',
+  eosToken: '</s>',
+  chatTemplate: `
         {%- if messages[0].role == 'system' -%}
             {%- set system_message = messages[0].content -%}
             {%- set messages = messages.slice(1) -%}
@@ -24,6 +24,6 @@ const danube2Template: TemplateConfig = {
             {%- endif -%}
         {%- endfor -%}
     `
-  }
+};
 
 export default danube2Template;

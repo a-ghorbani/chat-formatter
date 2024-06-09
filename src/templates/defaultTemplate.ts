@@ -1,9 +1,9 @@
-import { TemplateConfig } from "../types";
+import { TemplateConfig } from '../types';
 
 const defaultTemplate: TemplateConfig = {
-    bosToken: '',
-    eosToken: '',
-    chatTemplate: `
+  bosToken: '',
+  eosToken: '',
+  chatTemplate: `
         {%- for message in messages -%}
             {{'<|im_start|>' + message.role + '\n' + message.content + '<|im_end|>\n'}}
         {%- endfor -%}
@@ -11,6 +11,6 @@ const defaultTemplate: TemplateConfig = {
             {{ '<|im_start|>assistant\n' }}
         {%- endif -%}
         `
-  };
-  
-  export default defaultTemplate;
+};
+
+export default defaultTemplate;

@@ -1,9 +1,9 @@
-import { TemplateConfig } from "../types";
+import { TemplateConfig } from '../types';
 
 const gemmaItTemplate: TemplateConfig = {
-    bosToken: '<bos>',
-    eosToken: '<eos>',
-    chatTemplate: `
+  bosToken: '<bos>',
+  eosToken: '<eos>',
+  chatTemplate: `
         {%- if messages[0].role == 'system' -%}
             {%- set system_message = messages[0].content | trim + '\\n\\n' -%}
             {%- set messages = messages.slice(1) -%}
@@ -35,6 +35,6 @@ const gemmaItTemplate: TemplateConfig = {
             {{- '<start_of_turn>model\\n' -}}
         {%- endif -%}
     `
-}
+};
 
 export default gemmaItTemplate;

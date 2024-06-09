@@ -1,9 +1,9 @@
-import { TemplateConfig } from "../types";
+import { TemplateConfig } from '../types';
 
 const phi3Template: TemplateConfig = {
-    bosToken: '<s>',
-    eosToken: '<|endoftext|>',
-    chatTemplate: `
+  bosToken: '<s>',
+  eosToken: '<|endoftext|>',
+  chatTemplate: `
         {%- if messages[0].role == 'system' -%}
             {%- set offset = 1 -%}
         {%- else -%}
@@ -23,6 +23,6 @@ const phi3Template: TemplateConfig = {
             {{- '<|assistant|>\n' -}}
         {%- endif -%}
         `
-  }
+};
 
 export default phi3Template;

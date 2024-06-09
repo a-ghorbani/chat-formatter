@@ -1,9 +1,9 @@
-import { TemplateConfig } from "../types";
+import { TemplateConfig } from '../types';
 
 const chatMLTemplate: TemplateConfig = {
-    bosToken: '',
-    eosToken: '',
-    chatTemplate: `
+  bosToken: '',
+  eosToken: '',
+  chatTemplate: `
         {%- if messages[0].role == 'system' -%}
             {%- set offset = 1 -%}
         {%- else %}
@@ -23,6 +23,6 @@ const chatMLTemplate: TemplateConfig = {
             {{- '<|im_start|>assistant\n' -}}
         {%- endif -%}
       `
-  }
+};
 
-  export default chatMLTemplate;
+export default chatMLTemplate;
