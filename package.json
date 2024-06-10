@@ -19,14 +19,15 @@
         "formatter",
         "template",
         "nunjucks",
-        "conversation"
+        "gpt",
+        "llm"
     ],
     "author": "Asghar Ghorbani <ghorbani59@gmail.com>",
     "license": "MIT",
     "bugs": {
         "url": "https://github.com/a-ghorbani/chat-formatter/issues"
     },
-    "homepage": "https://github.com/a-ghorbani/chat-formatter#readme",
+    "homepage": "https://github.com/a-ghorbani/chat-formatter",
     "devDependencies": {
         "@types/jest": "^29.5.12",
         "@typescript-eslint/eslint-plugin": "^7.12.0",
