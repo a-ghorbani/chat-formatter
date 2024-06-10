@@ -13,7 +13,7 @@ describe('Template Rendering Tests', () => {
     ];
 
     it('should render default without generation prompt', async () => {
-      const result = await applyTemplate(conversation, {});
+      const result = applyTemplate(conversation, {});
       console.log('result: ', result);
       expect(result).toBe(
         `<|im_start|>user
@@ -27,7 +27,7 @@ Can I ask a question?<|im_end|>
     });
 
     it('should render default with generation prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         addGenerationPrompt: true
       });
       console.log('result: ', result);
@@ -59,7 +59,7 @@ Can I ask a question?<|im_end|>
     ];
 
     it('should render chatMLTemplate without generation prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         templateKey: 'chatML'
       });
       expect(result).toBe(
@@ -74,7 +74,7 @@ Can I ask a question?<|im_end|>
     });
 
     it('should render chatMLTemplate with generation prompt', async () => {
-      const result = await applyTemplate(conversationWSystem, {
+      const result = applyTemplate(conversationWSystem, {
         templateKey: 'chatML',
         addGenerationPrompt: true
       });
@@ -121,7 +121,7 @@ Can I ask a question?<|im_end|>
     ];
 
     it('Should render Llama-3 template without generation prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         templateKey: 'llama3'
       });
       expect(result).toBe(
@@ -136,7 +136,7 @@ Can I ask a question?<|eot_id|>`
     });
 
     it('Should render Llama-3 template with generation prompt', async () => {
-      const result = await applyTemplate(conversationWSystem, {
+      const result = applyTemplate(conversationWSystem, {
         templateKey: 'llama3',
         addGenerationPrompt: true
       });
@@ -172,7 +172,7 @@ Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
     ];
 
     it('Should render Phi-3 template without generation prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         templateKey: 'phi3'
       });
       console.log('result: ', result);
@@ -188,7 +188,7 @@ Can I ask a question?<|end|>
     });
 
     it('Should render Phi-3 template with generation prompt', async () => {
-      const result = await applyTemplate(conversationWSystem, {
+      const result = applyTemplate(conversationWSystem, {
         templateKey: 'phi3',
         addGenerationPrompt: true
       });
@@ -223,7 +223,7 @@ Can I ask a question?<|end|>
     ];
 
     it('Should render Gemma-it template without generation prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         templateKey: 'gemmaIt'
       });
       console.log('result: ', result);
@@ -239,7 +239,7 @@ Can I ask a question?<end_of_turn>
     });
 
     it('Should render Gemma-it template with generation prompt', async () => {
-      const result = await applyTemplate(conversationWSystem, {
+      const result = applyTemplate(conversationWSystem, {
         templateKey: 'gemmaIt',
         addGenerationPrompt: true
       });
@@ -274,7 +274,7 @@ Can I ask a question?<end_of_turn>
     ];
 
     it('Should render Danube-2 template without system prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         templateKey: 'danube2',
         addGenerationPrompt: true
       });
@@ -285,7 +285,7 @@ Can I ask a question?<end_of_turn>
     });
 
     it('Should render Danube-2 template with system prompt', async () => {
-      const result = await applyTemplate(conversationWSystem, {
+      const result = applyTemplate(conversationWSystem, {
         templateKey: 'danube2',
         addGenerationPrompt: true
       });
@@ -318,7 +318,7 @@ Can I ask a question?<end_of_turn>
     };
 
     it('Should render custom template without generation prompt', async () => {
-      const result = await applyTemplate(conversation, {
+      const result = applyTemplate(conversation, {
         customTemplate: template
       });
       console.log('result: ', result);
@@ -336,7 +336,7 @@ Can I ask a question?<|im_end|>
     });
 
     it('Should render custom template with generation prompt', async () => {
-      const result = await applyTemplate(conversationWSystem, {
+      const result = applyTemplate(conversationWSystem, {
         customTemplate: template,
         addGenerationPrompt: true
       });

@@ -12,10 +12,10 @@ interface ApplyTemplateOptions {
   isEndOfSequence?: boolean;
 }
 
-const applyTemplate = async (
+const applyTemplate = (
   conversation: Conversation | Conversation[],
   options: ApplyTemplateOptions = {}
-): Promise<string | string[]> => {
+): string | string[] => {
   const {
     templateKey = 'default',
     customTemplate,
@@ -39,7 +39,7 @@ const applyTemplate = async (
     });
 
   if (Array.isArray(conversation[0])) {
-    return Promise.all((conversation as Conversation[]).map(renderTemplate));
+    return (conversation as Conversation[]).map(renderTemplate);
   } else {
     return renderTemplate(conversation as Conversation);
   }

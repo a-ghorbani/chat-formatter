@@ -1,0 +1,11 @@
+# Directories
+node_modules/
+src/
+tests/
+/.vscode/**/*
+
+# Specific files
+*.ts
+tsconfig.json
+*.test.ts
+jest.config.js
