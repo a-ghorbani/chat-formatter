@@ -2,9 +2,11 @@ import nunjucks from 'nunjucks';
 import { Conversation } from '../types/conversation';
 import { templates } from '../templates';
 import { setupNunjucksEnvironment } from '../utils/nunjucksEnvironment';
+import { TemplateConfig } from '../types';
 
 interface ApplyTemplateOptions {
   templateKey?: string;
+  customTemplate?: TemplateConfig;
   addGenerationPrompt?: boolean;
   isBeginningOfSequence?: boolean;
   isEndOfSequence?: boolean;
@@ -16,13 +18,16 @@ const applyTemplate = async (
 ): Promise<string | string[]> => {
   const {
     templateKey = 'default',
+    customTemplate,
     addGenerationPrompt = false,
     isBeginningOfSequence = true,
     isEndOfSequence = true
   } = options;
 
   setupNunjucksEnvironment();
-  const template = templates[templateKey];
+
+  // If both templateKey and customTemplate are provided, customTemplate takes precedence.
+  const template: TemplateConfig = customTemplate ?? templates[templateKey];
   const templateString = template.chatTemplate;
 
   const renderTemplate = (chat: Conversation): string =>

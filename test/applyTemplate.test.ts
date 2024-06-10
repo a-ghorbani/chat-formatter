@@ -1,6 +1,7 @@
 // tests/applyTemplate.test.ts
 
 import applyTemplate from '../src/core/applyTemplate';
+import { TemplateConfig } from '../src/types';
 import { Conversation } from '../src/types/conversation';
 
 describe('Template Rendering Tests', () => {
@@ -50,7 +51,7 @@ Can I ask a question?<|im_end|>
       { role: 'user', content: 'Can I ask a question?' }
     ];
 
-    const conversationWSystem = [
+    const conversationWSystem: Conversation = [
       { role: 'system', content: 'System prompt.' },
       { role: 'user', content: 'Hi there!' },
       { role: 'assistant', content: 'Nice to meet you!' },
@@ -265,14 +266,14 @@ Can I ask a question?<end_of_turn>
       { role: 'user', content: 'Can I ask a question?' }
     ];
 
-    const conversationWSystem = [
+    const conversationWSystem: Conversation = [
       { role: 'system', content: 'System prompt.' },
       { role: 'user', content: 'Hi there!' },
       { role: 'assistant', content: 'Nice to meet you!' },
       { role: 'user', content: 'Can I ask a question?' }
     ];
 
-    it('Should render Danube-2 template without generation prompt', async () => {
+    it('Should render Danube-2 template without system prompt', async () => {
       const result = await applyTemplate(conversation, {
         templateKey: 'danube2',
         addGenerationPrompt: true
@@ -283,7 +284,7 @@ Can I ask a question?<end_of_turn>
       );
     });
 
-    it('Should render Danube-2 template with generation prompt', async () => {
+    it('Should render Danube-2 template with system prompt', async () => {
       const result = await applyTemplate(conversationWSystem, {
         templateKey: 'danube2',
         addGenerationPrompt: true
@@ -291,6 +292,66 @@ Can I ask a question?<end_of_turn>
       console.log('result: ', result);
       expect(result).toBe(
         'System prompt.<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      );
+    });
+  });
+
+  describe('Custom Template Tests', () => {
+    const conversation: Conversation = [
+      { role: 'user', content: 'Hi there!' },
+      { role: 'assistant', content: 'Nice to meet you!' },
+      { role: 'user', content: 'Can I ask a question?' }
+    ];
+
+    const conversationWSystem: Conversation = [
+      { role: 'system', content: 'System prompt.' },
+      { role: 'user', content: 'Hi there!' },
+      { role: 'assistant', content: 'Nice to meet you!' },
+      { role: 'user', content: 'Can I ask a question?' }
+    ];
+
+    const template: TemplateConfig = {
+      bosToken: '',
+      eosToken: '<|im_end|>"',
+      chatTemplate:
+        "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
+    };
+
+    it('Should render custom template without generation prompt', async () => {
+      const result = await applyTemplate(conversation, {
+        customTemplate: template
+      });
+      console.log('result: ', result);
+      expect(result).toBe(
+        `<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      );
+    });
+
+    it('Should render custom template with generation prompt', async () => {
+      const result = await applyTemplate(conversationWSystem, {
+        customTemplate: template,
+        addGenerationPrompt: true
+      });
+      console.log('result: ', result);
+      expect(result).toBe(
+        `<|im_start|>system
+System prompt.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+<|im_start|>assistant
+`
       );
     });
   });
