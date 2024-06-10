@@ -1,8 +1,8 @@
 
-# Chat Formatter: A TypeScript Library for Formatting Chat
+# A TypeScript Library for Formatting Chat
 
 
-Chat Formatter is a TypeScript library meant to format chat using Nunjucks templating (similar to Jinja2). It comes with templates for various models like chatML, Llama-3, Phi-3, Gemma-it, and H2O.ai's danube2.
+Chat Formatter is a TypeScript library meant to format chat history using [Nunjucks](https://mozilla.github.io/nunjucks/) templating (similar to [Jinja2](http://jinja.pocoo.org/)). It comes with templates for various models like chatML, Llama-3, Phi-3, Gemma-it, and H2O.ai's danube2.
 
 Chat models are trained with unique formats to convert conversation history, like:
 ```Python
@@ -150,13 +150,13 @@ Expected output:
 
 Let's say this code doesn't have a template for Qwen1.5.
 
-We need to get the chat template (most probably it is stated somewhere in Jinja format). For Qwen1.5, we will head to the model repository on HF and look at[tokenizer_config.json line 31](https://huggingface.co/Qwen/Qwen1.5-72B-Chat/blob/main/tokenizer_config.json#L31), where `chat_template` is defined. It is: 
+We need to get the chat template (most probably it is stated somewhere in Jinja format). For Qwen1.5, we will head to the model repository on HF and look at [tokenizer_config.json line 31](https://huggingface.co/Qwen/Qwen1.5-72B-Chat/blob/main/tokenizer_config.json#L31), where `chat_template` is defined. It is: 
 ```json
     "chat_template": "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}",
 ```
 We need to make sure this is compatible with Nunjucks.
 
-In this case, we don't need to change anything; we are just going to use the template as is:
+Luckily, in this case, we don't need to change anything; we are just going to use the template as is:
 ```typescript
 const template: TemplateConfig = {
   bosToken: '',
