@@ -2,7 +2,7 @@
 # A TypeScript Library for Formatting Chat
 
 
-Chat Formatter is a TypeScript library meant to format chat history using [Nunjucks](https://mozilla.github.io/nunjucks/) templating (similar to [Jinja2](http://jinja.pocoo.org/)). It comes with templates for various models like chatML, Llama-3, Phi-3, Gemma-it, and H2O.ai's danube2.
+Chat Formatter is a TypeScript library meant to format chat history using [Nunjucks](https://mozilla.github.io/nunjucks/) templating (similar to [Jinja2](http://jinja.pocoo.org/)). It comes with templates for various models like chatML, Llama-3, Phi-3, Gemma-it, and H2O.ai's danube2 and danube3.
 
 Chat models are trained with unique formats to convert conversation history, like:
 ```Python
@@ -117,11 +117,11 @@ Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
 ```
 
-###  Using Different Templates (Danube2)
+###  Using Different Templates (Danube3)
 
-Some models, such as Danube2, do not accept system prompts. The [original template of Danube2](https://huggingface.co/h2oai/h2o-danube2-1.8b-chat/blob/main/tokenizer_config.json) suggest throwing an exception.
+Some models, such as Danube3, do not accept system prompts. The [original template of Danube3](https://huggingface.co/h2oai/h2o-danube3-4b-chat/blob/main/tokenizer_config.json) suggest throwing an exception.
 ```json
-  "chat_template": "{% for message in messages %}{% if message['role'] == 'user' %}{{ '<|prompt|>' + message['content'] + eos_token }}{% elif message['role'] == 'system' %}{{ raise_exception('System role not supported') }}{% elif message['role'] == 'assistant' %}{{ '<|answer|>'  + message['content'] + eos_token }}{% endif %}{% if loop.last and add_generation_prompt %}{{ '<|answer|>' }}{% endif %}{% endfor %}"
+  "chat_template": "{% for message in messages %}{% if message['role'] == 'system' %}{{ raise_exception('System role not supported') }}{% endif %}{% if ((message['role'] == 'user') != (loop.index0 % 2 == 0)) or ((message['role'] == 'assistant') != (loop.index0 % 2 == 1)) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}{% if message['role'] == 'user' %}{{ '<|prompt|>' + message['content'].strip() + eos_token }}{% elif message['role'] == 'assistant' %}{{ '<|answer|>' + message['content'].strip() + eos_token }}{% endif %}{% endfor %}{% if add_generation_prompt %}{{ '<|answer|>' }}{% endif %}",
 ```
 
 The templates in this repo incorporate system prompts as closely as possible to what a working workaround could be.  
@@ -134,7 +134,7 @@ const conversation: Conversation = [
   { role: 'user', content: 'Can I ask a question?' }
 ];
 const resultWithPrompt = await applyTemplate(conversation, {
-  templateKey: 'danube2',
+  templateKey: 'danube3',
   addGenerationPrompt: true
 });
 console.log(resultWithPrompt);
@@ -143,7 +143,7 @@ console.log(resultWithPrompt);
 Expected output:
 
 ```
-'System prompt.<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
 ```
 
 ###  Using Custom Templates 
