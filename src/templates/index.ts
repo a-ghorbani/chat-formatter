@@ -4,6 +4,7 @@ import llama3Template from './llama3Template';
 import phi3Template from './phi3Template';
 import gemmaItTemplate from './gemmaItTemplate';
 import danube2Template from './danube2Template';
+import danube3Template from './danube3Template';
 import { Templates } from '../types';
 
 export const templates: Templates = {
@@ -12,5 +13,6 @@ export const templates: Templates = {
   llama3: llama3Template,
   phi3: phi3Template,
   gemmaIt: gemmaItTemplate,
-  danube2: danube2Template
+  danube2: danube2Template,
+  danube3: danube3Template
 };

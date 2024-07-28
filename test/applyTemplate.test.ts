@@ -291,7 +291,44 @@ Can I ask a question?<end_of_turn>
       });
       console.log('result: ', result);
       expect(result).toBe(
-        'System prompt.<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+        'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      );
+    });
+  });
+
+  describe('Danue-3 Tests', () => {
+    const conversation: Conversation = [
+      { role: 'user', content: 'Hi there!' },
+      { role: 'assistant', content: 'Nice to meet you!' },
+      { role: 'user', content: 'Can I ask a question?' }
+    ];
+
+    const conversationWSystem: Conversation = [
+      { role: 'system', content: 'System prompt.' },
+      { role: 'user', content: 'Hi there!' },
+      { role: 'assistant', content: 'Nice to meet you!' },
+      { role: 'user', content: 'Can I ask a question?' }
+    ];
+
+    it('Should render Danube-3 template without system prompt', async () => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'danube3',
+        addGenerationPrompt: true
+      });
+      console.log('result: ', result);
+      expect(result).toBe(
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      );
+    });
+
+    it('Should render Danube-3 template with system prompt', async () => {
+      const result = applyTemplate(conversationWSystem, {
+        templateKey: 'danube3',
+        addGenerationPrompt: true
+      });
+      console.log('result: ', result);
+      expect(result).toBe(
+        'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
       );
     });
   });
