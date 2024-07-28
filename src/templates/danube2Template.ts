@@ -6,7 +6,7 @@ const danube2Template: TemplateConfig = {
   // prettier-ignore
   chatTemplate:
     "{%- if messages[0].role == 'system' -%}" +
-    "    {%- set system_message = messages[0].content -%}" +
+    "    {%- set system_message = messages[0].content + eos_token -%}" +
     "    {%- set messages = messages.slice(1) -%}" +
     "{%- else -%}" +
     "    {%- set system_message = '' -%}" +
