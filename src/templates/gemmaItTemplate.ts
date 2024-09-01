@@ -5,6 +5,7 @@ const gemmaItTemplate: TemplateConfig = {
   eosToken: '<eos>',
   // prettier-ignore
   chatTemplate:
+    "{{- bos_token -}}" +
     "{%- if messages[0].role == 'system' -%}" +
     "    {%- set system_message = messages[0].content | trim + '\\n\\n' -%}" +
     "    {%- set messages = messages.slice(1) -%}" +
