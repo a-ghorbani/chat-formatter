@@ -19,6 +19,8 @@ const phi3Template: TemplateConfig = {
     "{%- endfor -%}" +
     "{%- if add_generation_prompt -%}" +
     "    {{- '<|assistant|>\n' -}}" +
+    "{%- else -%}" +
+    "    {{- eos_token -}}" +
     "{%- endif -%}"
 };
 
