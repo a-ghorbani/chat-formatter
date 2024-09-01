@@ -224,7 +224,10 @@ Can I ask a question?<|end|>
 
     it('Should render Gemma-it template without generation prompt', async () => {
       const result = applyTemplate(conversation, {
-        templateKey: 'gemmaIt'
+        templateKey: 'gemmaIt',
+        addGenerationPrompt: false,
+        isBeginningOfSequence: false,
+        isEndOfSequence: false
       });
       console.log('result: ', result);
       expect(result).toBe(
@@ -241,13 +244,71 @@ Can I ask a question?<end_of_turn>
     it('Should render Gemma-it template with generation prompt', async () => {
       const result = applyTemplate(conversationWSystem, {
         templateKey: 'gemmaIt',
-        addGenerationPrompt: true
+        addGenerationPrompt: true,
+        isBeginningOfSequence: true,
+        isEndOfSequence: false
+      });
+      console.log('result: ', result);
+      expect(result).toBe(
+        `<bos><start_of_turn>user
+System prompt.
+
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+<start_of_turn>model
+`
+      );
+    });
+  });
+
+  describe('Gemmasutra Tests', () => {
+    const conversation: Conversation = [
+      { role: 'user', content: 'Hi there!' },
+      { role: 'assistant', content: 'Nice to meet you!' },
+      { role: 'user', content: 'Can I ask a question?' }
+    ];
+
+    const conversationWSystem = [
+      { role: 'system', content: 'System prompt.' },
+      { role: 'user', content: 'Hi there!' },
+      { role: 'assistant', content: 'Nice to meet you!' },
+      { role: 'user', content: 'Can I ask a question?' }
+    ];
+
+    it('Should render Gemmasutra template without generation prompt', async () => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'gemmasutra',
+        addGenerationPrompt: false,
+        isBeginningOfSequence: false,
+        isEndOfSequence: false
       });
       console.log('result: ', result);
       expect(result).toBe(
         `<start_of_turn>user
-System prompt.
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+`
+      );
+    });
 
+    it('Should render Gemmasutra template with generation prompt', async () => {
+      const result = applyTemplate(conversationWSystem, {
+        templateKey: 'gemmasutra',
+        addGenerationPrompt: true,
+        isBeginningOfSequence: true,
+        isEndOfSequence: false
+      });
+      console.log('result: ', result);
+      expect(result).toBe(
+        `<bos><start_of_turn>system
+System prompt.<end_of_turn>
+<start_of_turn>user
 Hi there!<end_of_turn>
 <start_of_turn>model
 Nice to meet you!<end_of_turn>
