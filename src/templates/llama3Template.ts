@@ -2,7 +2,9 @@ import { TemplateConfig } from '../types';
 
 const llama3Template: TemplateConfig = {
   bosToken: '<|begin_of_text|>',
-  eosToken: '<|eot_id|>',
+  eosToken: '<|end_of_text|>',
+  addBosToken: false,
+  addEosToken: false,
   // prettier-ignore
   chatTemplate:
     "{%- set loop_messages = messages -%}" +

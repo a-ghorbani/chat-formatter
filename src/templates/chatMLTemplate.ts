@@ -3,6 +3,8 @@ import { TemplateConfig } from '../types';
 const chatMLTemplate: TemplateConfig = {
   bosToken: '',
   eosToken: '',
+  addBosToken: false,
+  addEosToken: false,
   // prettier-ignore
   chatTemplate:
     "{%- if messages[0].role == 'system' -%}" +
