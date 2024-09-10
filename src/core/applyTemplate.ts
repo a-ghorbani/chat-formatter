@@ -24,14 +24,14 @@ const applyTemplate = (
     isEndOfSequence
   } = options;
 
-  setupNunjucksEnvironment();
+  const nunjucksEnv = setupNunjucksEnvironment();
 
   // If both templateKey and customTemplate are provided, customTemplate takes precedence.
   const template: TemplateConfig = customTemplate ?? templates[templateKey];
   const templateString = template.chatTemplate;
 
   const renderTemplate = (chat: Conversation): string => {
-    let result = nunjucks.renderString(templateString, {
+    let result = nunjucksEnv.renderString(templateString, {
       messages: chat,
       add_generation_prompt: addGenerationPrompt,
       bos_token: template.bosToken,

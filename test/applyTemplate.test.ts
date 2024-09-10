@@ -172,16 +172,16 @@ Can I ask a question?<|im_end|>
   });
 
   describe('chatMLTemplate Tests', () => {
-    it('should throw an error for incorrect role sequence', async () => {
+    it('should throw an error for incorrect role sequence', () => {
       const badConversation: Conversation = [
         { role: 'user', content: 'Hi!' },
         { role: 'user', content: 'Still there?' } // Incorrect sequence
       ];
 
-      await expect(
-        applyTemplate(badConversation, { templateKey: 'chatML' })
-      ).rejects.toThrow(
-        'Conversation roles must alternate user/assistant/user/assistant/...'
+      expect(() => {
+        applyTemplate(badConversation, { templateKey: 'chatML' });
+      }).toThrow(
+        /Conversation roles must alternate user\/assistant\/user\/assistant\//
       );
     });
   });
