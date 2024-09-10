@@ -5,9 +5,12 @@ import { TemplateConfig } from '../types';
 const gemmasutraTemplate: TemplateConfig = {
   bosToken: '<bos>',
   eosToken: '<eos>',
+  addBosToken: false, // It is already part of the chatTemplate
+  addEosToken: false,
   // prettier-ignore
   chatTemplate:
     "{{- bos_token -}}" +
+
     "{%- for message in messages -%}" +
       "{%- set content = message.content -%}" +
       "{%- if (message.role == 'assistant') -%}" +

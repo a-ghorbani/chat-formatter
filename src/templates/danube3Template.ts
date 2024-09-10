@@ -3,6 +3,8 @@ import { TemplateConfig } from '../types';
 const danube3Template: TemplateConfig = {
   bosToken: '<s>',
   eosToken: '</s>',
+  addBosToken: false,
+  addEosToken: false,
   // prettier-ignore
   chatTemplate: 
     "{%- if messages[0].role == 'system' -%}" +

@@ -3,6 +3,8 @@ import { TemplateConfig } from '../types';
 const defaultTemplate: TemplateConfig = {
   bosToken: '',
   eosToken: '',
+  addBosToken: false,
+  addEosToken: false,
   // prettier-ignore
   chatTemplate:
         "{%- for message in messages -%}" +

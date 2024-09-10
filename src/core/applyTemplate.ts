@@ -20,8 +20,8 @@ const applyTemplate = (
     templateKey = 'default',
     customTemplate,
     addGenerationPrompt = false,
-    isBeginningOfSequence = true,
-    isEndOfSequence = true
+    isBeginningOfSequence,
+    isEndOfSequence
   } = options;
 
   setupNunjucksEnvironment();
@@ -30,13 +30,36 @@ const applyTemplate = (
   const template: TemplateConfig = customTemplate ?? templates[templateKey];
   const templateString = template.chatTemplate;
 
-  const renderTemplate = (chat: Conversation): string =>
-    nunjucks.renderString(templateString, {
+  const renderTemplate = (chat: Conversation): string => {
+    let result = nunjucks.renderString(templateString, {
       messages: chat,
       add_generation_prompt: addGenerationPrompt,
-      bos_token: isBeginningOfSequence ? template.bosToken : '',
-      eos_token: isEndOfSequence ? template.eosToken : ''
+      bos_token: template.bosToken,
+      eos_token: template.eosToken
     });
+
+    const shouldAddBosToken =
+      isBeginningOfSequence !== undefined
+        ? isBeginningOfSequence
+        : template.addBosToken;
+
+    const shouldAddEosToken =
+      isEndOfSequence !== undefined ? isEndOfSequence : template.addEosToken;
+
+    if (shouldAddBosToken && template.bosToken) {
+      if (!result.startsWith(template.bosToken)) {
+        result = template.bosToken + result;
+      }
+    }
+
+    if (shouldAddEosToken && template.eosToken) {
+      if (!result.endsWith(template.eosToken)) {
+        result += template.eosToken;
+      }
+    }
+
+    return result;
+  };
 
   if (Array.isArray(conversation[0])) {
     return (conversation as Conversation[]).map(renderTemplate);

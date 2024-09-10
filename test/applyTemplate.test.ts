@@ -5,17 +5,23 @@ import { TemplateConfig } from '../src/types';
 import { Conversation } from '../src/types/conversation';
 
 describe('Template Rendering Tests', () => {
-  describe('Default template tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
+  const baseConversation: Conversation = [
+    { role: 'user', content: 'Hi there!' },
+    { role: 'assistant', content: 'Nice to meet you!' },
+    { role: 'user', content: 'Can I ask a question?' }
+  ];
 
-    it('should render default without generation prompt', async () => {
-      const result = applyTemplate(conversation, {});
-      console.log('result: ', result);
-      expect(result).toBe(
+  const conversationWithSystem: Conversation = [
+    { role: 'system', content: 'System prompt.' },
+    ...baseConversation
+  ];
+
+  describe('Default Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
         `<|im_start|>user
 Hi there!<|im_end|>
 <|im_start|>assistant
@@ -23,15 +29,39 @@ Nice to meet you!<|im_end|>
 <|im_start|>user
 Can I ask a question?<|im_end|>
 `
-      );
-    });
-
-    it('should render default with generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        addGenerationPrompt: true
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
         `<|im_start|>user
 Hi there!<|im_end|>
 <|im_start|>assistant
@@ -40,45 +70,11 @@ Nice to meet you!<|im_end|>
 Can I ask a question?<|im_end|>
 <|im_start|>assistant
 `
-      );
-    });
-  });
-
-  describe('chatMLTemplate Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem: Conversation = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('should render chatMLTemplate without generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        templateKey: 'chatML'
-      });
-      expect(result).toBe(
-        `<|im_start|>user
-Hi there!<|im_end|>
-<|im_start|>assistant
-Nice to meet you!<|im_end|>
-<|im_start|>user
-Can I ask a question?<|im_end|>
-`
-      );
-    });
-
-    it('should render chatMLTemplate with generation prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'chatML',
-        addGenerationPrompt: true
-      });
-      expect(result).toBe(
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
         `<|im_start|>system
 System prompt.<|im_end|>
 <|im_start|>user
@@ -89,9 +85,93 @@ Nice to meet you!<|im_end|>
 Can I ask a question?<|im_end|>
 <|im_start|>assistant
 `
-      );
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, config);
+      expect(result).toBe(expected);
     });
+  });
 
+  describe('chatML Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+<|im_start|>assistant
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        `<|im_start|>system
+System prompt.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+<|im_start|>assistant
+`
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'chatML',
+        ...config
+      });
+      expect(result).toBe(expected);
+    });
+  });
+
+  describe('chatMLTemplate Tests', () => {
     it('should throw an error for incorrect role sequence', async () => {
       const badConversation: Conversation = [
         { role: 'user', content: 'Hi!' },
@@ -106,25 +186,12 @@ Can I ask a question?<|im_end|>
     });
   });
 
-  describe('Llama-3 Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('Should render Llama-3 template without generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        templateKey: 'llama3'
-      });
-      expect(result).toBe(
+  describe('Llama-3 Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
         `<|begin_of_text|><|start_header_id|>user<|end_header_id|>
 
 Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
@@ -132,16 +199,53 @@ Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
 
 Can I ask a question?<|eot_id|>`
-      );
-    });
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|begin_of_text|><|start_header_id|>user<|end_header_id|>
 
-    it('Should render Llama-3 template with generation prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'llama3',
-        addGenerationPrompt: true
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|>`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|><|end_of_text|>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<|begin_of_text|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
         `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
 
 System prompt.<|eot_id|><|start_header_id|>user<|end_header_id|>
@@ -153,48 +257,76 @@ Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
 Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
 
 `
-      );
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'llama3',
+        ...config
+      });
+      expect(result).toBe(expected);
     });
   });
 
-  describe('Phi-3 Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('Should render Phi-3 template without generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        templateKey: 'phi3'
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
+  describe('Phi-3 Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<|user|>
+Hi there!<|end|>
+<|assistant|>
+Nice to meet you!<|end|>
+<|user|>
+Can I ask a question?<|end|>
+<|endoftext|>`
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|user|>
+Hi there!<|end|>
+<|assistant|>
+Nice to meet you!<|end|>
+<|user|>
+Can I ask a question?<|end|>
+<|endoftext|>`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
         `<s><|user|>
 Hi there!<|end|>
 <|assistant|>
 Nice to meet you!<|end|>
 <|user|>
 Can I ask a question?<|end|>
+<|endoftext|>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<|user|>
+Hi there!<|end|>
+<|assistant|>
+Nice to meet you!<|end|>
+<|user|>
+Can I ask a question?<|end|>
+<|assistant|>
 `
-      );
-    });
-
-    it('Should render Phi-3 template with generation prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'phi3',
-        addGenerationPrompt: true
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
-        `<s><|system|>
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        `<|system|>
 System prompt.<|end|>
 <|user|>
 Hi there!<|end|>
@@ -204,52 +336,75 @@ Nice to meet you!<|end|>
 Can I ask a question?<|end|>
 <|assistant|>
 `
-      );
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'phi3',
+        ...config
+      });
+      expect(result).toBe(expected);
     });
   });
 
-  describe('Gemma-it Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('Should render Gemma-it template without generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        templateKey: 'gemmaIt',
-        addGenerationPrompt: false,
-        isBeginningOfSequence: false,
-        isEndOfSequence: false
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
-        `<start_of_turn>user
+  describe('Gemma-it Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<bos><start_of_turn>user
 Hi there!<end_of_turn>
 <start_of_turn>model
 Nice to meet you!<end_of_turn>
 <start_of_turn>user
 Can I ask a question?<end_of_turn>
 `
-      );
-    });
-
-    it('Should render Gemma-it template with generation prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'gemmaIt',
-        addGenerationPrompt: true,
-        isBeginningOfSequence: true,
-        isEndOfSequence: false
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<bos><start_of_turn>user
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<bos><start_of_turn>user
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+<eos>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<bos><start_of_turn>user
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+<start_of_turn>model
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
         `<bos><start_of_turn>user
 System prompt.
 
@@ -260,52 +415,75 @@ Nice to meet you!<end_of_turn>
 Can I ask a question?<end_of_turn>
 <start_of_turn>model
 `
-      );
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'gemmaIt',
+        ...config
+      });
+      expect(result).toBe(expected);
     });
   });
 
-  describe('Gemmasutra Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('Should render Gemmasutra template without generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        templateKey: 'gemmasutra',
-        addGenerationPrompt: false,
-        isBeginningOfSequence: false,
-        isEndOfSequence: false
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
-        `<start_of_turn>user
+  describe('Gemmasutra Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<bos><start_of_turn>user
 Hi there!<end_of_turn>
 <start_of_turn>model
 Nice to meet you!<end_of_turn>
 <start_of_turn>user
 Can I ask a question?<end_of_turn>
 `
-      );
-    });
-
-    it('Should render Gemmasutra template with generation prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'gemmasutra',
-        addGenerationPrompt: true,
-        isBeginningOfSequence: true,
-        isEndOfSequence: false
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<bos><start_of_turn>user
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<bos><start_of_turn>user
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+<eos>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<bos><start_of_turn>user
+Hi there!<end_of_turn>
+<start_of_turn>model
+Nice to meet you!<end_of_turn>
+<start_of_turn>user
+Can I ask a question?<end_of_turn>
+<start_of_turn>model
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
         `<bos><start_of_turn>system
 System prompt.<end_of_turn>
 <start_of_turn>user
@@ -316,141 +494,198 @@ Nice to meet you!<end_of_turn>
 Can I ask a question?<end_of_turn>
 <start_of_turn>model
 `
-      );
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'gemmasutra',
+        ...config
+      });
+      expect(result).toBe(expected);
     });
   });
 
-  describe('Danue-2 Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem: Conversation = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('Should render Danube-2 template without system prompt', async () => {
+  describe('Danube-2 Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s>'
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s>'
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        '<s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s>'
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
       const result = applyTemplate(conversation, {
         templateKey: 'danube2',
-        addGenerationPrompt: true
+        ...config
       });
-      console.log('result: ', result);
-      expect(result).toBe(
-        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
-      );
-    });
-
-    it('Should render Danube-2 template with system prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'danube2',
-        addGenerationPrompt: true
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
-        'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
-      );
+      expect(result).toBe(expected);
     });
   });
 
-  describe('Danue-3 Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem: Conversation = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    it('Should render Danube-3 template without system prompt', async () => {
+  describe('Danube-3 Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s>'
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s>'
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        '<s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s>'
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
       const result = applyTemplate(conversation, {
         templateKey: 'danube3',
-        addGenerationPrompt: true
+        ...config
       });
-      console.log('result: ', result);
-      expect(result).toBe(
-        '<|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
-      );
-    });
-
-    it('Should render Danube-3 template with system prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
-        templateKey: 'danube3',
-        addGenerationPrompt: true
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
-        'System prompt.</s><|prompt|>Hi there!</s><|answer|>Nice to meet you!</s><|prompt|>Can I ask a question?</s><|answer|>'
-      );
+      expect(result).toBe(expected);
     });
   });
 
-  describe('Custom Template Tests', () => {
-    const conversation: Conversation = [
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const conversationWSystem: Conversation = [
-      { role: 'system', content: 'System prompt.' },
-      { role: 'user', content: 'Hi there!' },
-      { role: 'assistant', content: 'Nice to meet you!' },
-      { role: 'user', content: 'Can I ask a question?' }
-    ];
-
-    const template: TemplateConfig = {
-      bosToken: '',
-      eosToken: '<|im_end|>"',
-      chatTemplate:
-        "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n' }}{% endif %}{{'<|im_start|>' + message['role'] + '\n' + message['content'] + '<|im_end|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_start|>assistant\n' }}{% endif %}"
-    };
-
-    it('Should render custom template without generation prompt', async () => {
-      const result = applyTemplate(conversation, {
-        customTemplate: template
-      });
-      console.log('result: ', result);
-      expect(result).toBe(
-        `<|im_start|>system
-You are a helpful assistant.<|im_end|>
-<|im_start|>user
-Hi there!<|im_end|>
-<|im_start|>assistant
-Nice to meet you!<|im_end|>
-<|im_start|>user
-Can I ask a question?<|im_end|>
+  describe('Custom Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<|text_start|><|im_s|>system
+You are a helpful assistant.<|im_e|>
+<|im_s|>user
+Hi there!<|im_e|>
+<|im_s|>assistant
+Nice to meet you!<|im_e|>
+<|im_s|>user
+Can I ask a question?<|im_e|>
 `
-      );
-    });
-
-    it('Should render custom template with generation prompt', async () => {
-      const result = applyTemplate(conversationWSystem, {
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|im_s|>system
+You are a helpful assistant.<|im_e|>
+<|im_s|>user
+Hi there!<|im_e|>
+<|im_s|>assistant
+Nice to meet you!<|im_e|>
+<|im_s|>user
+Can I ask a question?<|im_e|>
+`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<|text_start|><|im_s|>system
+You are a helpful assistant.<|im_e|>
+<|im_s|>user
+Hi there!<|im_e|>
+<|im_s|>assistant
+Nice to meet you!<|im_e|>
+<|im_s|>user
+Can I ask a question?<|im_e|>
+<|text_end|>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<|text_start|><|im_s|>system
+You are a helpful assistant.<|im_e|>
+<|im_s|>user
+Hi there!<|im_e|>
+<|im_s|>assistant
+Nice to meet you!<|im_e|>
+<|im_s|>user
+Can I ask a question?<|im_e|>
+<|im_s|>assistant
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        `<|text_start|><|im_s|>system
+System prompt.<|im_e|>
+<|im_s|>user
+Hi there!<|im_e|>
+<|im_s|>assistant
+Nice to meet you!<|im_e|>
+<|im_s|>user
+Can I ask a question?<|im_e|>
+<|im_s|>assistant
+`
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const template: TemplateConfig = {
+        bosToken: '<|text_start|>',
+        eosToken: '<|text_end|>',
+        addBosToken: true,
+        addEosToken: false,
+        chatTemplate:
+          "{% for message in messages %}{% if loop.first and messages[0]['role'] != 'system' %}{{ '<|im_s|>system\nYou are a helpful assistant.<|im_e|>\n' }}{% endif %}{{'<|im_s|>' + message['role'] + '\n' + message['content'] + '<|im_e|>' + '\n'}}{% endfor %}{% if add_generation_prompt %}{{ '<|im_s|>assistant\n' }}{% endif %}"
+      };
+      const result = applyTemplate(conversation, {
         customTemplate: template,
-        addGenerationPrompt: true
+        ...config
       });
-      console.log('result: ', result);
-      expect(result).toBe(
-        `<|im_start|>system
-System prompt.<|im_end|>
-<|im_start|>user
-Hi there!<|im_end|>
-<|im_start|>assistant
-Nice to meet you!<|im_end|>
-<|im_start|>user
-Can I ask a question?<|im_end|>
-<|im_start|>assistant
-`
-      );
+      expect(result).toBe(expected);
     });
   });
 });
