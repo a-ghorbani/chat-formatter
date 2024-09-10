@@ -6,6 +6,7 @@ import gemmaItTemplate from './gemmaItTemplate';
 import gemmasutraTemplate from './gemmasutraTemplate';
 import danube2Template from './danube2Template';
 import danube3Template from './danube3Template';
+import qwen2Template from './qwen2Template';
 import { Templates } from '../types';
 
 export const templates: Templates = {
@@ -16,5 +17,6 @@ export const templates: Templates = {
   gemmaIt: gemmaItTemplate,
   gemmasutra: gemmasutraTemplate,
   danube2: danube2Template,
-  danube3: danube3Template
+  danube3: danube3Template,
+  qwen2: qwen2Template
 };
