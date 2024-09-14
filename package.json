@@ -1,6 +1,6 @@
 {
     "name": "chat-formatter",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "A package to format chat conversation for large language models (LLMs) with Nunjucks.",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",

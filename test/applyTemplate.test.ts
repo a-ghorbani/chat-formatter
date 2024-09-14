@@ -640,7 +640,7 @@ Hi there!<|im_end|>
 Nice to meet you!<|im_end|>
 <|im_start|>user
 Can I ask a question?<|im_end|>
-<|endoftext|>`
+<|im_end|>`
       ],
       [
         'with generation prompt',

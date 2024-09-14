@@ -2,7 +2,7 @@ import { TemplateConfig } from '../types';
 
 const qwen2Template: TemplateConfig = {
   bosToken: '',
-  eosToken: '<|endoftext|>',
+  eosToken: '<|im_end|>',
   addBosToken: false,
   addEosToken: false,
   // prettier-ignore
