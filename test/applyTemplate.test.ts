@@ -681,6 +681,93 @@ Can I ask a question?<|im_end|>
     });
   });
 
+  describe('Qwen2.5 Template', () => {
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+<|im_end|>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+<|im_start|>assistant
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        `<|im_start|>system
+System prompt.<|im_end|>
+<|im_start|>user
+Hi there!<|im_end|>
+<|im_start|>assistant
+Nice to meet you!<|im_end|>
+<|im_start|>user
+Can I ask a question?<|im_end|>
+<|im_start|>assistant
+`
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'qwen25',
+        ...config
+      });
+      expect(result).toBe(expected);
+    });
+  });
+
   describe('Custom Template', () => {
     it.each([
       [
