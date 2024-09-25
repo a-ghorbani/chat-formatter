@@ -1,6 +1,7 @@
 import defaultTemplate from './defaultTemplate';
 import chatMLTemplate from './chatMLTemplate';
 import llama3Template from './llama3Template';
+import llama32Template from './llama3.2Template';
 import phi3Template from './phi3Template';
 import gemmaItTemplate from './gemmaItTemplate';
 import gemmasutraTemplate from './gemmasutraTemplate';
@@ -14,6 +15,7 @@ export const templates: Templates = {
   default: defaultTemplate,
   chatML: chatMLTemplate,
   llama3: llama3Template,
+  llama32: llama32Template,
   phi3: phi3Template,
   gemmaIt: gemmaItTemplate,
   gemmasutra: gemmasutraTemplate,

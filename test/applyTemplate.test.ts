@@ -3,6 +3,7 @@
 import applyTemplate from '../src/core/applyTemplate';
 import { TemplateConfig } from '../src/types';
 import { Conversation } from '../src/types/conversation';
+import { strftime } from '../src/utils/utils';
 
 describe('Template Rendering Tests', () => {
   const baseConversation: Conversation = [
@@ -261,6 +262,112 @@ Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
     ])('should render %s', (_, conversation, config, expected) => {
       const result = applyTemplate(conversation, {
         templateKey: 'llama3',
+        ...config
+      });
+      expect(result).toBe(expected);
+    });
+  });
+
+  describe('Llama-3.2 Template', () => {
+    const today = strftime(new Date(), '%d %b %Y');
+
+    it.each([
+      [
+        'default',
+        baseConversation,
+        {},
+        `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+Cutting Knowledge Date: December 2023
+Today Date: ${today}
+
+<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|>`
+      ],
+      [
+        'without generation/BOS/EOS',
+        baseConversation,
+        {
+          addGenerationPrompt: false,
+          isBeginningOfSequence: false,
+          isEndOfSequence: false
+        },
+        `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+Cutting Knowledge Date: December 2023
+Today Date: 25 Sep 2024
+
+<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|>`
+      ],
+      [
+        'without generation prompt and with eos and bos',
+        baseConversation,
+        { isEndOfSequence: true, isBeginningOfSequence: true },
+        `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+Cutting Knowledge Date: December 2023
+Today Date: ${today}
+
+<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|>`
+      ],
+      [
+        'with generation prompt',
+        baseConversation,
+        { addGenerationPrompt: true },
+        `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+Cutting Knowledge Date: December 2023
+Today Date: ${today}
+
+<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+`
+      ],
+      [
+        'with system prompt with generation prompt',
+        conversationWithSystem,
+        { addGenerationPrompt: true },
+        `<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+Cutting Knowledge Date: December 2023
+Today Date: ${today}
+
+System prompt.<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Hi there!<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+Nice to meet you!<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+Can I ask a question?<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+
+`
+      ]
+    ])('should render %s', (_, conversation, config, expected) => {
+      const result = applyTemplate(conversation, {
+        templateKey: 'llama32',
         ...config
       });
       expect(result).toBe(expected);
